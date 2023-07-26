@@ -6,7 +6,6 @@ use App\Form\CalculationFormType;
 use App\Form\Model\CalculationFormModel;
 use App\Repository\CalculationRepository;
 use App\Service\CalculationService;
-use App\Service\CalculatorProducer;
 use App\Service\SendMessageInterface;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\NonUniqueResultException;
