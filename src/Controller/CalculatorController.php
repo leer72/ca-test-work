@@ -7,6 +7,7 @@ use App\Form\Model\CalculationFormModel;
 use App\Repository\CalculationRepository;
 use App\Service\CalculationService;
 use App\Service\CalculatorProducer;
+use App\Service\SendMessageInterface;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,9 +18,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class CalculatorController extends AbstractController
 {
     public function __construct(
-        private readonly CalculatorProducer $producer,
         private readonly CalculationService $calculationService,
         private readonly CalculationRepository $calculationRepository,
+        private readonly SendMessageInterface $sendMessage,
     ) {
     }
 
@@ -40,21 +41,19 @@ class CalculatorController extends AbstractController
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            if ($form->get('add')->isClicked()) {
-                /** @var CalculationFormModel $calculation */
-                $calculation = $form->getData();
+        if ($form->isSubmitted() && $form->isValid() && $form->get('add')->isClicked()) {
+            /** @var CalculationFormModel $calculation */
+            $calculation = $form->getData();
 
-                $msg = [
-                    'argumentA' => $calculation->argumentA,
-                    'operation' => $calculation->operation,
-                    'argumentB' => $calculation->argumentB,
-                ];
+            $msg = [
+                'argumentA' => $calculation->argumentA,
+                'operation' => $calculation->operation,
+                'argumentB' => $calculation->argumentB,
+            ];
 
-                $this->producer->getProducer()->publish(serialize($msg));
+            $this->sendMessage->sendMessage($msg);
 
-                $result = 'Вычисление добавлено в очередь';
-            }
+            $result = 'Вычисление добавлено в очередь';
         }
 
         if ($form->getClickedButton() && 'show' === $form->getClickedButton()->getName()) {

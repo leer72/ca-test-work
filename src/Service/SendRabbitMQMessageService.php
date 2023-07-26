@@ -4,7 +4,7 @@ namespace App\Service;
 
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 
-class CalculatorProducer
+class SendRabbitMQMessageService implements SendMessageInterface
 {
     public function __construct(
         private readonly ProducerInterface $producer
@@ -14,5 +14,10 @@ class CalculatorProducer
     public function getProducer(): ProducerInterface
     {
         return $this->producer;
+    }
+
+    public function sendMessage(array $message): void
+    {
+        $this->getProducer()->publish(serialize($message));
     }
 }
