@@ -26,5 +26,5 @@ services:
     app.consumer.calculator:
         class: App\Service\CalculatorConsumer
 
-    App\Service\CalculatorProducer:
+    App\Service\SendRabbitMQMessageService:
         arguments: ['@old_sound_rabbit_mq.calculator_producer']
