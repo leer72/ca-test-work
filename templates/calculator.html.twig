@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="container-fluid">
+        <h1 class="mt-4">Калькулятор</h1>
+
+        {% if not calculatorForm.vars.valid and showValidationError %}
+            <div class="alert alert-danger" role="alert">
+                {{ form_errors(calculatorForm) }}
+            </div>
+        {% endif %}
+
+        {{ form_start(calculatorForm, {
+            attr: { class: 'form-signin' }
+        }) }}
+
+        <div class="row g-3">
+            <div class="col-auto">
+                    {{ form_widget(calculatorForm.argumentA, {
+                        attr: { placeholder: 'Аргумент 1', class: 'form-control'}
+                    }) }}
+            </div>
+
+            <div class="col-auto">
+                    {{ form_widget(calculatorForm.operation, {
+                        attr: { placeholder: 'Операция', class: 'form-control'}
+                    }) }}
+            </div>
+
+            <div class="col-auto">
+                    {{ form_widget(calculatorForm.argumentB, {
+                        attr: { placeholder: 'Аргумент 2', class: 'form-control'}
+                    }) }}
+            </div>
+
+            <div class="col-auto">
+                {{ form_widget(calculatorForm.add, { 'label': 'Добавить в очередь' }) }}
+            </div>
+
+            <div class="col-auto">
+                {{ form_widget(calculatorForm.show, { 'label': 'Результат' }) }}
+            </div>
+        </div>
+
+        {{ form_end(calculatorForm)}}
+
+        {% if result is not null %}
+            <div class="alert alert-success" role="alert">
+                {{ result }}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

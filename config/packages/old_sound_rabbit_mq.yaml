@@ -1,0 +1,14 @@
+old_sound_rabbit_mq:
+    connections:
+        default:
+            url: '%env(RABBITMQ_URL)%'
+    producers:
+        calculator:
+            connection: default
+            exchange_options: {name: 'calculator', type: direct}
+    consumers:
+        calculator:
+            connection: default
+            exchange_options: {name: 'calculator', type: direct}
+            queue_options: {name: 'calculator'}
+            callback: app.consumer.calculator
