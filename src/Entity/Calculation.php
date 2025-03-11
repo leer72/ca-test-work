@@ -10,6 +10,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CalculationRepository::class)]
+#[ORM\UniqueConstraint(
+    name: 'calculation_unique_constraint',
+    columns: ['argument_a', 'argument_b', 'operation'],
+)]
 class Calculation implements EntityInterface
 {
     private const ENTITY_NAME = 'Вычисление';
@@ -51,6 +55,12 @@ class Calculation implements EntityInterface
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private DateTimeImmutable $createdAt;
+
+    #[ORM\Column(type: Types::FLOAT, nullable: true)]
+    private ?float $result;
+
+    #[ORM\Column(name: 'is_shown', type: Types::BOOLEAN, options: ['default' => false])]
+    private bool $isShown = false;
 
     public function __construct(
         float $argumentA,
@@ -121,9 +131,33 @@ class Calculation implements EntityInterface
         return $this;
     }
 
-    public function calculate(): float
+    public function getResult(): ?float
     {
-        return match ($this->getOperation()) {
+        return $this->result;
+    }
+
+    public function setResult(?float $result): Calculation
+    {
+        $this->result = $result;
+
+        return $this;
+    }
+
+    public function isShown(): bool
+    {
+        return $this->isShown;
+    }
+
+    public function setIsShown(bool $isShown): Calculation
+    {
+        $this->isShown = $isShown;
+
+        return $this;
+    }
+
+    public function calculate(): void
+    {
+        $this->result = match ($this->getOperation()) {
             CalculatorOperationsEnum::ADDITION => $this->getArgumentA() + $this->getArgumentB(),
             CalculatorOperationsEnum::SUBTRACTION => $this->getArgumentA() - $this->getArgumentB(),
             CalculatorOperationsEnum::MULTIPLICATION => $this->getArgumentA() * $this->getArgumentB(),

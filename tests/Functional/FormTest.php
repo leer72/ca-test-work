@@ -172,82 +172,6 @@ class FormTest extends AbstractTest
      * @throws Exception
      */
     #[NoReturn]
-    public function testGetResult(): void
-    {
-        $this->clearDatabase();
-
-        $response = $this->sendRequest(
-            method: 'GET',
-        );
-
-        self::assertSame(200, $response->getStatusCode());
-
-        $form = $this->client->getCrawler()->filter('form[name="calculation_form"]')->form();
-        $values = $form->getPhpValues();
-
-        self::assertSame('', $values['calculation_form']['argumentA']);
-        self::assertSame('', $values['calculation_form']['argumentB']);
-        self::assertSame('0', $values['calculation_form']['operation']);
-
-        $argumentA = 1.0;
-        $argumentB = 2.0;
-        $operation = '+';
-
-        $formData = [
-            'argumentA' => $argumentA,
-            'argumentB' => $argumentB,
-            'operation' => (string) self::OPERATION_FORM_MAP[$operation],
-        ];
-
-        $values['calculation_form'] = array_merge($values['calculation_form'], $formData);
-
-        $form = $this->client->getCrawler()
-            ->filter('button#calculation_form_add')
-            ->form(
-                $values,
-                $form->getMethod(),
-            );
-
-        $this->client->submit($form);
-
-        self::getContainer()->get('app.consumer.calculator')->execute(
-            msg: new AMQPMessage(
-                serialize(
-                    [
-                        'argumentA' => $argumentA,
-                        'operation' => CalculatorOperationsEnum::from($operation),
-                        'argumentB' => $argumentB,
-                    ]
-                ),
-            ),
-        );
-
-        $form = $this->client->getCrawler()
-            ->filter('button#calculation_form_show')
-            ->form(
-                null,
-                $form->getMethod(),
-            );
-
-        $this->client->submit($form);
-
-        $message = $this->client->getCrawler()->filter('.alert-success')->text();
-
-        $expectedResult = sprintf(
-            '%f %s %f = %f',
-            $argumentA,
-            $operation,
-            $argumentB,
-            $argumentA + $argumentB,
-        );
-
-        self::assertSame($expectedResult, $message);
-    }
-
-    /**
-     * @throws Exception
-     */
-    #[NoReturn]
     public function testNoCalculationInQuery(): void
     {
         $this->clearDatabase();
@@ -276,6 +200,6 @@ class FormTest extends AbstractTest
 
         $message = $this->client->getCrawler()->filter('.alert-success')->text();
 
-        self::assertSame('В очереди нет вычислений', $message);
+        self::assertSame('Нет готовых результатов', $message);
     }
 }

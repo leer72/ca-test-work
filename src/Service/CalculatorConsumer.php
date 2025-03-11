@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use Doctrine\DBAL\Exception;
+use Doctrine\ORM\EntityNotFoundException;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 
@@ -14,15 +15,16 @@ class CalculatorConsumer implements ConsumerInterface
     }
 
     /**
-     * @throws Exception
+     * @param AMQPMessage $msg
      * @return void
-     * @var AMQPMessage $msg
+     * @throws EntityNotFoundException
+     * @throws Exception
      */
     public function execute(AMQPMessage $msg): void
     {
         $calculationArray = unserialize($msg->getBody());
 
-        $calculation = $this->calculationService->createFromArray($calculationArray);
+        $calculation = $this->calculationService->calculate($calculationArray);
 
         echo 'Создано вычисление с ID: ' . $calculation->getId() . PHP_EOL;
     }
