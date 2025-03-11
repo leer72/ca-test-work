@@ -6,8 +6,7 @@
 /public/bundles/
 /var/
 /vendor/
-/docker/logs/*
-/docker/rabbitmq/*
+/docker/rabbitmq/
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
@@ -21,3 +20,4 @@
 ###< symfony/phpunit-bridge ###
 
 .idea
+/docker/logs/
