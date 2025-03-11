@@ -6,9 +6,12 @@ use App\Entity\Calculation;
 use App\Enum\CalculatorOperationsEnum;
 use App\Repository\CalculationRepository;
 use Doctrine\DBAL\Exception;
+use Doctrine\ORM\EntityNotFoundException;
 
 class CalculationService
 {
+    public const CALCULATION_ID_ARRAY_KEY = 'calculation_id';
+
     public function __construct(
         private readonly CalculationRepository $calculatorRepository
     ) {
@@ -37,6 +40,31 @@ class CalculationService
     public function delete(Calculation $calculation): void
     {
         $this->calculatorRepository->remove($calculation);
+    }
+
+    /**
+     * @throws Exception
+     * @throws EntityNotFoundException
+     */
+    public function calculate(array $calculationArray): Calculation
+    {
+        if (!isset($calculationArray[self::CALCULATION_ID_ARRAY_KEY])) {
+            throw new Exception('Не передан идентификатор вычисления');
+        }
+
+        /** @var Calculation $calculation */
+        $calculation = $this->calculatorRepository->findOneBy(
+            ['id' => $calculationArray[self::CALCULATION_ID_ARRAY_KEY]]
+        );
+
+        if (is_null($calculation)) {
+            throw new EntityNotFoundException('Вычисление не найдено');
+        }
+
+        $calculation->calculate();
+        $this->calculatorRepository->flush();
+
+        return $calculation;
     }
 
     /**

@@ -6,6 +6,7 @@ old_sound_rabbit_mq:
         calculator:
             connection: default
             exchange_options: {name: 'calculator', type: direct}
+            default_delivery_mode: 2
     consumers:
         calculator:
             connection: default

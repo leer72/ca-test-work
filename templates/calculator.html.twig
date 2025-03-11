@@ -44,9 +44,11 @@
         {{ form_end(calculatorForm)}}
 
         {% if result is not null %}
+            {% for item in result %}
             <div class="alert alert-success" role="alert">
-                {{ result }}
+                {{ item }}
             </div>
+            {% endfor %}
         {% endif %}
     </div>
 {% endblock %}
